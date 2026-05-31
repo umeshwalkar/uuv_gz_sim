@@ -4,6 +4,9 @@ project(UUVPlugins)
 
 find_package(gz-sim8 REQUIRED)
 
+# --------------------------------------------------
+# Thruster Plugin
+# --------------------------------------------------
 add_library(
     ThrusterPlugin
     SHARED
@@ -15,7 +18,24 @@ target_link_libraries(
     gz-sim8::gz-sim8
 )
 
+# --------------------------------------------------
+# Hydrodynamics Plugin
+# --------------------------------------------------
+add_library(
+    HydrodynamicsPlugin
+    SHARED
+    HydrodynamicsPlugin.cpp
+)
+
+target_link_libraries(
+    HydrodynamicsPlugin
+    gz-sim8::gz-sim8
+)
+
+# --------------------------------------------------
+# Install
+# --------------------------------------------------
 install(
-    TARGETS ThrusterPlugin
+    TARGETS ThrusterPlugin HydrodynamicsPlugin
     LIBRARY DESTINATION lib
 )
