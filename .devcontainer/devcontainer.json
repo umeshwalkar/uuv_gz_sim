@@ -1,0 +1,32 @@
+{
+    "name": "gazebo-harmonic",
+
+    "build": {
+        "dockerfile": "Dockerfile"
+    },
+
+    "workspaceFolder": "/workspace",
+
+    "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind",
+
+    "runArgs": [
+        "--privileged",
+        "--net=host"
+    ],
+
+    "containerEnv": {
+        "DISPLAY": "host.docker.internal:0.0"
+    },
+
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-vscode.cpptools",
+                "ms-vscode.cmake-tools",
+                "twxs.cmake"
+            ]
+        }
+    },
+
+    "remoteUser": "root"
+}
