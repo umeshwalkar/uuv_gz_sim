@@ -33,9 +33,37 @@ target_link_libraries(
 )
 
 # --------------------------------------------------
+# FinPlugin Plugin
+# --------------------------------------------------
+add_library(
+    FinPlugin
+    SHARED
+    FinPlugin.cpp
+)
+
+target_link_libraries(
+    FinPlugin
+    gz-sim8::gz-sim8
+)
+
+# --------------------------------------------------
+# StateEstimatorPlugin Plugin
+# --------------------------------------------------
+add_library(
+    StateEstimatorPlugin
+    SHARED
+    StateEstimatorPlugin.cpp
+)
+
+target_link_libraries(
+    StateEstimatorPlugin
+    gz-sim8::gz-sim8
+)
+
+# --------------------------------------------------
 # Install
 # --------------------------------------------------
 install(
-    TARGETS ThrusterPlugin HydrodynamicsPlugin
+    TARGETS ThrusterPlugin HydrodynamicsPlugin FinPlugin StateEstimatorPlugin
     LIBRARY DESTINATION lib
 )
