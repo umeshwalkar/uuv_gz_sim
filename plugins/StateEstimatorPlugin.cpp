@@ -7,6 +7,7 @@
 #include <gz/msgs/imu.pb.h>
 // #include <gz/msgs/altimeter.pb.h>
 #include <gz/msgs/double.pb.h>
+#include <gz/msgs/vector3d.pb.h>
 
 #include <functional>
 #include <iostream>
@@ -56,7 +57,27 @@ public:
           << this->depthTopic
           << std::endl;
     }
-  }
+
+    velocityTopic = "/uuv/velocity";
+
+    velocitySubscribed =
+        node.Subscribe<gz::msgs::Vector3d>(
+            velocityTopic,
+            std::function<void(const gz::msgs::Vector3d &)>(
+                [this](const gz::msgs::Vector3d &_msg)
+                {
+                  this->OnVelocity(_msg);
+                }));
+
+    if (!this->velocitySubscribed)
+    {
+      std::cerr
+          << "[StateEstimatorPlugin] Failed to subscribe "
+          << this->velocityTopic
+          << std::endl;
+    }
+
+  } // override
 
   // void PreUpdate(
   //     const gz::sim::UpdateInfo & /*info*/,
@@ -86,6 +107,20 @@ public:
   }
 
 private:
+  void OnVelocity(
+      const gz::msgs::Vector3d &msg)
+  {
+    std::lock_guard<std::mutex> lock(mutex);
+
+    surgeVel = msg.x();
+    swayVel = msg.y();
+    heaveVel = msg.z();
+
+    std::cout << "[Velocity] surgeVel=" << surgeVel
+              << " swayVel=" << swayVel
+              << " heaveVel=" << heaveVel << "\n";
+  }
+
   void OnDepth(const gz::msgs::Double &msg)
   {
     std::lock_guard<std::mutex> lock(this->mutex);
@@ -131,6 +166,13 @@ private:
   double lastAccX{0}, lastAccY{0}, lastAccZ{0};
   double lastGyroX{0}, lastGyroY{0}, lastGyroZ{0};
   double depthMeters{0.0};
+
+  double surgeVel{0.0};
+  double swayVel{0.0};
+  double heaveVel{0.0};
+
+  bool velocitySubscribed{false};
+  std::string velocityTopic;
 };
 
 GZ_ADD_PLUGIN(

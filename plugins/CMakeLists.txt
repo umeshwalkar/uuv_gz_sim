@@ -72,9 +72,18 @@ target_link_libraries(DepthSensorPlugin
     gz-msgs10::gz-msgs10)
 
 # --------------------------------------------------
+# VelocitySensorPlugin Plugin
+# --------------------------------------------------
+add_library(VelocitySensorPlugin SHARED
+    VelocitySensorPlugin.cpp)
+
+target_link_libraries(VelocitySensorPlugin
+    gz-sim8::gz-sim8)
+
+# --------------------------------------------------
 # Install
 # --------------------------------------------------
 install(
-    TARGETS ThrusterPlugin HydrodynamicsPlugin FinPlugin StateEstimatorPlugin DepthSensorPlugin
+    TARGETS ThrusterPlugin HydrodynamicsPlugin FinPlugin StateEstimatorPlugin DepthSensorPlugin VelocitySensorPlugin
     LIBRARY DESTINATION lib
 )
