@@ -37,3 +37,14 @@ make -j$(nproc)
 - run the simulation
 gz sim /workspace/worlds/ocean.sdf
 gz sim --verbose models/my_auv/model.sdf
+
+- in another terminal check topics
+gz topic -l
+gz topic -l | grep depth
+gz topic -l | grep imu
+gz topic -l | grep velocity
+
+- check topic data
+gz topic -e -t /uuv/depth
+gz topic -e -t /uuv/imu
+gz topic -e -t /uuv/velocity
