@@ -3,6 +3,10 @@
 #include <gz/plugin/Register.hh>
 
 #include <gz/sim/Link.hh>
+#include <gz/math/Pose3.hh>
+#include <gz/math/Vector3.hh>
+
+#include <iostream>
 
 using namespace gz;
 using namespace sim;
@@ -102,36 +106,47 @@ void ActuatorPlugin::PreUpdate(
 
     Link link(linkEntity);
 
-    //----------------------------------------
+    //--------------------------------------------------
     // THRUST
-    //----------------------------------------
+    //--------------------------------------------------
 
     const double thrustForce =
         (this->thrustPercent / 100.0) *
         this->maxThrustForce;
 
+    auto pose =
+        link.WorldPose(_ecm);
+
+    if (!pose)
+        return;
+
+    math::Vector3d bodyForce(
+        thrustForce,
+        0.0,
+        0.0);
+
+    math::Vector3d worldForce =
+        pose->Rot().RotateVector(bodyForce);
+
     link.AddWorldForce(
         _ecm,
-        math::Vector3d(
-            thrustForce,
-            0.0,
-            0.0));
+        worldForce);
 
-    //----------------------------------------
-    // X-FIN MIXER
-    //----------------------------------------
+    //--------------------------------------------------
+    // X FIN MIXER
+    //--------------------------------------------------
 
     const double pitchCmd =
         (finTL + finTR)
-      - (finBL + finBR);
+        - (finBL + finBR);
 
     const double yawCmd =
         (finTR + finBR)
-      - (finTL + finBL);
+        - (finTL + finBL);
 
     const double rollCmd =
         (finTL + finBR)
-      - (finTR + finBL);
+        - (finTR + finBL);
 
     const double pitchMoment =
         pitchGain * pitchCmd;
@@ -141,10 +156,6 @@ void ActuatorPlugin::PreUpdate(
 
     const double rollMoment =
         rollGain * rollCmd;
-
-    //----------------------------------------
-    // APPLY MOMENTS
-    //----------------------------------------
 
     link.AddWorldWrench(
         _ecm,
@@ -159,8 +170,8 @@ void ActuatorPlugin::PreUpdate(
 GZ_ADD_PLUGIN(
     ActuatorPlugin,
     gz::sim::System,
-    ActuatorPlugin::ISystemConfigure,
-    ActuatorPlugin::ISystemPreUpdate)
+    gz::sim::ISystemConfigure,
+    gz::sim::ISystemPreUpdate)
 
 GZ_ADD_PLUGIN_ALIAS(
     ActuatorPlugin,

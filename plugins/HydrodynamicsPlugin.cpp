@@ -3,10 +3,9 @@
 #include <gz/plugin/Register.hh>
 
 #include <gz/sim/Link.hh>
-// #include <gz/sim/components/WorldLinearVelocity.hh>
-// #include <gz/sim/components/WorldAngularVelocity.hh>
-#include <gz/sim/components/LinearVelocity.hh>
-#include <gz/sim/components/AngularVelocity.hh>
+
+#include <cmath>
+#include <iostream>
 
 using namespace gz;
 using namespace sim;
@@ -21,7 +20,7 @@ void HydrodynamicsPlugin::Configure(
     this->model = Model(_entity);
 
     std::cout
-        << "HydrodynamicsPlugin loaded"
+        << "[HydrodynamicsPlugin] Loaded"
         << std::endl;
 }
 
@@ -57,25 +56,29 @@ void HydrodynamicsPlugin::PreUpdate(
     const double q = angVel->Y();
     const double r = angVel->Z();
 
-    math::Vector3d force(
+    math::Vector3d dragForce(
         -Xu * u * std::abs(u),
         -Yv * v * std::abs(v),
         -Zw * w * std::abs(w));
 
-    math::Vector3d torque(
+    math::Vector3d dragTorque(
         -Kp * p,
         -Mq * q,
         -Nr * r);
 
     link.AddWorldWrench(
         _ecm,
-        force,
-        torque);
+        dragForce,
+        dragTorque);
 }
 
 //////////////////////////////////////////////////
 GZ_ADD_PLUGIN(
     HydrodynamicsPlugin,
     gz::sim::System,
-    HydrodynamicsPlugin::ISystemConfigure,
-    HydrodynamicsPlugin::ISystemPreUpdate)
+    gz::sim::ISystemConfigure,
+    gz::sim::ISystemPreUpdate)
+
+GZ_ADD_PLUGIN_ALIAS(
+    HydrodynamicsPlugin,
+    "HydrodynamicsPlugin")
